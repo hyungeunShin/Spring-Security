@@ -1,5 +1,6 @@
 package com.example.security.config;
 
+import com.example.security.jwt.JwtUtil;
 import com.example.security.property.SecurityProperties;
 import com.example.security.repository.UserRepository;
 import jakarta.validation.Validator;
@@ -9,12 +10,14 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,6 +34,8 @@ public class SecurityConfig {
     private final SecurityProperties securityProperties;
     private final UserRepository repository;
     private final Validator validator;
+    private final JwtUtil jwtUtil;
+    private final StringRedisTemplate redisTemplate;
 
     @Bean
     public WebSecurityCustomizer customizer() {
@@ -48,8 +53,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable);
-//            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .formLogin(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .logout(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth -> {
             securityProperties.getPermitAllPath().forEach(path -> {
@@ -70,10 +76,10 @@ public class SecurityConfig {
     public LoginAuthenticationFilter loginAuthenticationFilter(HttpSecurity http) throws Exception {
         LoginAuthenticationFilter filter = new LoginAuthenticationFilter("/login", authenticationManager(http), validator);
         //세션 유지하고 싶으면 해당 코드 필요
-        filter.setSecurityContextRepository(new DelegatingSecurityContextRepository(
-                new RequestAttributeSecurityContextRepository(),
-                new HttpSessionSecurityContextRepository()
-        ));
+//        filter.setSecurityContextRepository(new DelegatingSecurityContextRepository(
+//                new RequestAttributeSecurityContextRepository(),
+//                new HttpSessionSecurityContextRepository()
+//        ));
         filter.setAuthenticationSuccessHandler(loginSuccessHandler());
         filter.setAuthenticationFailureHandler(loginFailureHandler());
         return filter;
@@ -81,7 +87,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler();
+        return new LoginSuccessHandler(jwtUtil, redisTemplate);
     }
 
     @Bean
@@ -91,19 +97,19 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
+        return new JwtAuthenticationFilter(jwtUtil, redisTemplate);
     }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .parentAuthenticationManager(null)
-                .authenticationProvider(jwtAuthenticationProvider())
-                .build();
+                   .parentAuthenticationManager(null)
+                   .authenticationProvider(loginAuthenticationProvider())
+                   .build();
     }
 
     @Bean
-    public LoginAuthenticationProvider jwtAuthenticationProvider() {
+    public LoginAuthenticationProvider loginAuthenticationProvider() {
         return new LoginAuthenticationProvider(passwordEncoder(), repository);
     }
 

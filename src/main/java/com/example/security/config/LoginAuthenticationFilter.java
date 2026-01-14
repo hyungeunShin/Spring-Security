@@ -28,7 +28,7 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
-        log.info("===========LoginAuthenticationFilter===========");
+        log.info("=========== LoginAuthenticationFilter ===========");
 
         ObjectMapper objectMapper = new ObjectMapper();
         LoginDTO dto = objectMapper.readValue(request.getInputStream(), LoginDTO.class);

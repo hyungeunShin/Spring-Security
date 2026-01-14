@@ -19,5 +19,6 @@ public class InitEvent {
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         repository.save(new User("aaa", passwordEncoder.encode("123"), LocalDateTime.now()));
+        repository.save(new User("bbb", passwordEncoder.encode("123"), LocalDateTime.now().minusDays(32)));
     }
 }

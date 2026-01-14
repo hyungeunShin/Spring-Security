@@ -28,7 +28,7 @@ public class LoginAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        log.info("===========JwtAuthenticationProvider===========");
+        log.info("=========== JwtAuthenticationProvider ===========");
         log.info("JwtAuthenticationProvider.Authentication: {}", authentication);
 
         String username = authentication.getName();
@@ -57,6 +57,8 @@ public class LoginAuthenticationProvider implements AuthenticationProvider {
             super.setAuthenticated(true);
         }
         */
-        return new UsernamePasswordAuthenticationToken(username, null, List.of());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, List.of());
+        token.setDetails(user);
+        return token;
     }
 }

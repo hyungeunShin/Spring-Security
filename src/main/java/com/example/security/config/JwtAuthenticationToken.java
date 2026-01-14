@@ -9,7 +9,6 @@ import java.util.Collection;
 @Getter
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private String token;
-    private String refreshToken;
 
     public JwtAuthenticationToken(String token) {
         super(null);

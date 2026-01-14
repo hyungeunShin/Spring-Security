@@ -22,6 +22,7 @@ security:
     - "/staticPath2"
   permit-all-path:
     - "/login"
+    - "/logout"
     - "/signUp"
 
 #logging:
@@ -30,3 +31,6 @@ security:
 
 jwt:
   secretKey: qweasdzxcrtyfghvbn1230984567)(*&^%$#@!
+#  access-token-expire-time: 1800000      # 30분
+  access-token-expire-time: 30000
+  refresh-token-expire-time: 604800000   # 7일
