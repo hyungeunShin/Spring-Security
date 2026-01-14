@@ -42,8 +42,20 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
         String username = dto.username();
         String password = dto.password();
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
+        /*
+        public UsernamePasswordAuthenticationToken(Object principal, Object credentials) {
+            super(null);
+            this.principal = principal;
+            this.credentials = credentials;
+            setAuthenticated(false);
+        }
 
-        return getAuthenticationManager().authenticate(authRequest);
+        @Override
+        public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+            //...
+            super.setAuthenticated(false);
+        }
+        */
+        return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 }

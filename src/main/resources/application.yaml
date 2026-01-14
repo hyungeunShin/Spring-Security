@@ -21,7 +21,7 @@ security:
     - "/staticPath1"
     - "/staticPath2"
   permit-all-path:
-#    - "/login"
+    - "/login"
     - "/signUp"
 
 #logging:

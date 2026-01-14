@@ -23,9 +23,9 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
 
-        LoginExceptionResponseDTO dto = new LoginExceptionResponseDTO(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        LoginExceptionResponseDTO dto = new LoginExceptionResponseDTO(exception.getMessage());
 
         ObjectMapper objectMapper = new ObjectMapper();
 

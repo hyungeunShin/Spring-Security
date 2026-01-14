@@ -1,6 +1,7 @@
 package com.example.security.config;
 
 import com.example.security.property.SecurityProperties;
+import com.example.security.repository.UserRepository;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,7 +29,7 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
     private final SecurityProperties securityProperties;
-    private final UserDetailsService userDetailsService;
+    private final UserRepository repository;
     private final Validator validator;
 
     @Bean
@@ -103,8 +103,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationProvider jwtAuthenticationProvider() {
-        return new JwtAuthenticationProvider(passwordEncoder(), userDetailsService);
+    public LoginAuthenticationProvider jwtAuthenticationProvider() {
+        return new LoginAuthenticationProvider(passwordEncoder(), repository);
     }
 
     @Bean
