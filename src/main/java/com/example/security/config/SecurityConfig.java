@@ -77,7 +77,22 @@ public class SecurityConfig {
     @Bean
     public LoginAuthenticationFilter loginAuthenticationFilter(HttpSecurity http) throws Exception {
         LoginAuthenticationFilter filter = new LoginAuthenticationFilter("/login", authenticationManager(http), validator);
-        //세션 유지하고 싶으면 해당 코드 필요
+        /*
+         * - RequestAttributeSecurityContextRepository:
+         *   인증 정보를 현재 요청의 attribute에 저장한다.
+         *   같은 요청 안에서만 유효하고, 요청이 끝나면 사라진다.
+         *   Spring Security 6 기본값이므로 STATELESS 환경에서는 별도 설정 불필요.
+         *
+         * - HttpSessionSecurityContextRepository:
+         *   인증 정보를 HttpSession에 저장한다.
+         *   다음 요청에서도 세션을 통해 인증 상태를 유지할 수 있다.
+         *   이걸 추가하면 STATELESS 설정이어도 세션이 생성될 수 있으므로 주의.
+         *
+         * - DelegatingSecurityContextRepository:
+         *   위 두 Repository를 묶어서 위임하는 래퍼.
+         *   저장 시 둘 다에 저장하고, 조회 시 순서대로 탐색한다.
+         *
+         */
 //        filter.setSecurityContextRepository(new DelegatingSecurityContextRepository(
 //                new RequestAttributeSecurityContextRepository(),
 //                new HttpSessionSecurityContextRepository()
