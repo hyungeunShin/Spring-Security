@@ -56,25 +56,29 @@ public class JwtUtil {
                    .compact();
     }
 
-    public boolean validateToken(String token) {
+    /**
+     * 토큰 상태를 검증한다.
+     * - VALID: 유효한 토큰
+     * - EXPIRED: 만료된 토큰 (refresh로 재발급 필요)
+     * - INVALID: 위변조, 형식 오류 등
+     */
+    public TokenStatus validateToken(String token) {
         try {
             Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token);
-            return true;
+            return TokenStatus.VALID;
         } catch(ExpiredJwtException e) {
-            log.warn("토큰 만료");
-            throw e;
-        } catch(UnsupportedJwtException e) {
-            log.error("잘못된 형식");
-        } catch(IllegalArgumentException e) {
-            log.error("공백");
+            log.info("토큰 만료");
+            return TokenStatus.EXPIRED;
         } catch(JwtException e) {
-            log.error("검증 불가");
+            log.warn("토큰 검증 실패: {}", e.getMessage());
+            return TokenStatus.INVALID;
+        } catch(IllegalArgumentException e) {
+            log.warn("빈 토큰");
+            return TokenStatus.INVALID;
         }
-
-        return false;
     }
 
     public Claims getClaims(String token) {
@@ -83,6 +87,10 @@ public class JwtUtil {
                    .build()
                    .parseSignedClaims(token)
                    .getPayload();
+    }
+
+    public String getUsername(String token) {
+        return getClaims(token).getSubject();
     }
 
     public long getRemainingTime(String token) {

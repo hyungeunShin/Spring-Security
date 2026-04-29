@@ -3,6 +3,7 @@ package com.example.security.config;
 import com.example.security.jwt.JwtUtil;
 import com.example.security.property.SecurityProperties;
 import com.example.security.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class SecurityConfig {
     private final Validator validator;
     private final JwtUtil jwtUtil;
     private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public WebSecurityCustomizer customizer() {
@@ -97,7 +99,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil, redisTemplate);
+        return new JwtAuthenticationFilter(jwtUtil, redisTemplate, objectMapper);
     }
 
     @Bean

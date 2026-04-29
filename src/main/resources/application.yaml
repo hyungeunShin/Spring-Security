@@ -24,6 +24,7 @@ security:
     - "/login"
     - "/logout"
     - "/signUp"
+    - "/refresh"
 
 #logging:
 #  level:
